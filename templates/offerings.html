@@ -1,0 +1,25 @@
+[[extend 'layout.html']]
+
+<div class="section">
+  <table class="table is-striped is-fullwidth">
+    <tr>
+      <td>Class Number</td>
+      <td>Class Name</td>
+      <td></td>
+    </tr>
+    [[for r in rows:]]
+      <tr>
+        <td>[[=r.catalog_class.number]]</td>
+        <td>[[=r.catalog_class.name]]</td>
+        <td>
+          <a class="button"
+             href="[[=URL('register', r.class_offering.id)]]">
+            Add
+          </a>
+        </td>
+      </tr>
+    [[pass]]
+  </table>
+
+
+</div>

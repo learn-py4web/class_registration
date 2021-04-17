@@ -64,15 +64,46 @@ Warning: Fixtures MUST be declared with @action.uses({fixtures}) else your app w
 
 
 from py4web import action, request, abort, redirect, URL
-from yatl.helpers import A
+from yatl.helpers import A, SPAN
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
+
+from py4web.utils.form import Form, FormStyleBulma
+from .common import Field
 
 url_signer = URLSigner(session)
 
 @action('index')
 @action.uses(db, auth, 'index.html')
 def index():
-
     return dict()
+
+@action('offerings')
+@action.uses(db, auth, 'offerings.html')
+def offerings():
+    rows = db(
+        (db.quarter.year == 2021) &
+        (db.quarter.season == "Spring") &
+        (db.class_offering.quarter_id == db.quarter.id) &
+        (db.class_offering.catalog_class_id == db.catalog_class.id)
+    ).select()
+    return dict(rows=rows)
+
+@action('register/<offering_id:int>', method=["GET", "POST"])
+@action.uses(db, session, auth.user, 'register.html')
+def register(offering_id=None):
+    assert offering_id is not None
+    offering_info = db(
+        (db.class_offering.id == offering_id) &
+        (db.class_offering.quarter_id == db.quarter.id) &
+        (db.class_offering.catalog_class_id == db.catalog_class.id)
+    ).select().first()
+    assert offering_info is not None
+    # At this point, I have the info to show to the user.
+    form = Form([Field('note', 'text')],
+                csrf_session=session, formstyle=FormStyleBulma
+                )
+    form.param.sidecar.append(SPAN(" ", A('Cancel', _class="button", _href=URL('offerings'))))
+    return dict(offering_info=offering_info,
+                form=form)
