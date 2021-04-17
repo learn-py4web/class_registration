@@ -36,7 +36,6 @@ db.define_table(
     Field('catalog_class_id', 'reference catalog_class'),
     Field('quarter_id', 'reference quarter', ondelete="CASCADE"),
     Field('number', 'integer'),
-    Field('taught_by', 'reference instructor'),
     Field('active', 'boolean') # Will this take place?
 )
 
@@ -58,11 +57,5 @@ db.define_table(
     Field('registration_date', 'datetime'),
 )
 
-db.define_table(
-    'instructor',
-    Field('email'),
-    Field('first_name'),
-    Field('last_name'),
-)
 
 db.commit()
