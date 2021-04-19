@@ -62,6 +62,7 @@ Warning: Fixtures MUST be declared with @action.uses({fixtures}) else your app w
 
 """
 
+import datetime
 
 from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A, SPAN
@@ -105,5 +106,19 @@ def register(offering_id=None):
                 csrf_session=session, formstyle=FormStyleBulma
                 )
     form.param.sidecar.append(SPAN(" ", A('Cancel', _class="button", _href=URL('offerings'))))
+    if form.accepted:
+        # Insert the note along with the registration.
+        # Get the student id.
+        student = db(db.student.email == get_user_email()).select().first()
+        assert student is not None
+        # Now we can insert the new registration record.
+        db.registration.insert(
+            student_id=student.id,
+            class_offering_id=offering_id,
+            is_waitlist=False,
+            note=form.vars["note"],
+            registration_date=datetime.datetime.utcnow(),
+        )
+        redirect(URL('index'))
     return dict(offering_info=offering_info,
                 form=form)
