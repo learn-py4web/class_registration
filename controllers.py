@@ -76,12 +76,12 @@ from .common import Field
 url_signer = URLSigner(session)
 
 @action('index')
-@action.uses(db, auth, 'index.html')
+@action.uses('index.html', db, auth)
 def index():
     return dict()
 
 @action('offerings')
-@action.uses(db, auth, 'offerings.html')
+@action.uses('offerings.html', db, auth)
 def offerings():
     rows = db(
         (db.quarter.year == 2021) &
@@ -92,7 +92,7 @@ def offerings():
     return dict(rows=rows)
 
 @action('register/<offering_id:int>', method=["GET", "POST"])
-@action.uses(db, session, auth.user, 'register.html')
+@action.uses('register.html', db, session, auth.user)
 def register(offering_id=None):
     assert offering_id is not None
     offering_info = db(
